@@ -3,6 +3,7 @@
  * Created by jefferson.wu on 02/02/2017.
  */
 
+"use strict"
 // ========================
 // MODULES ================
 // ========================
@@ -11,10 +12,14 @@ const app               = express();
 const http              = require('http').Server(app);
 const chalk             = require('chalk');
 const clear             = require('clear');
+const Twitter           = require('node-twitter-api');
 
 // =========================
 // custom ==================
 const promRes           = require('./modules/PromiseResponder');
+const secret            = require('./models/secret');
+// const secret            = include('secret');
+
 
 // =========================
 // CONFIGURATION ===========
@@ -22,6 +27,19 @@ const promRes           = require('./modules/PromiseResponder');
 
 const port              = process.env.PORT || 3000;
 
+//Twitter config object
+
+
+var _requestSecret;
+
+// ========================
+// initialization =========
+// ========================
+var twitter = new Twitter({
+    consumerKey: secret.consumerKey,
+    consumerSecret: secret.consumerSecret,
+    callback: secret.callback
+});
 
 
 // ====================
@@ -63,14 +81,25 @@ res.send('<b>You\'re on an active server.  Find the right page.</b>');
 app.get('/request-token', function(req, res){
     console.log(chalk.yellow('token request made...'));
 
-    // TODO: promisify return
-    promRes.getRandomPromiseData(3000).then(function(result){
-        console.log(chalk.green(result.payload.message));
-        res.json(result);
-    }).catch(function(reason){
-        console.log(chalk.red(reason.payload.message));
-        res.json(reason);
+    twitter.getRequestToken(function(err, requestToken, requestSecret, results){
+        if(err) {
+            res.status(500).send(err);
+        } else {
+            _requestSecret = requestSecret;
+
+            // pop open twitter in another window instead of a redirect.
+            res.redirect("https://api.twitter.com/oauth/authenticate?oauth_token=" + requestToken);
+        }
     });
+
+    // // TODO: promisify return
+    // promRes.getRandomPromiseData(3000).then(function(result){
+    //     console.log(chalk.green(result.payload.message));
+    //     res.json(result);
+    // }).catch(function(reason){
+    //     console.log(chalk.red(reason.payload.message));
+    //     res.json(reason);
+    // });
 
 });
 
