@@ -12,6 +12,9 @@ const http              = require('http').Server(app);
 const chalk             = require('chalk');
 const clear             = require('clear');
 
+// =========================
+// custom ==================
+const promRes           = require('./modules/PromiseResponder');
 
 // =========================
 // CONFIGURATION ===========
@@ -33,6 +36,19 @@ app.use(function(req,res,next){
     next();
 });
 
+//only allow local host (for now, until NGINX is in place)
+app.use(function(req, res, next){
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    next();
+});
+
+
+// --- header information ---
+app.use(function(req,res,next){
+    res.setHeader('X-Powered-By', 'Super Power Engine v0.0.1. ');
+    next();
+});
+
 // ==================
 // ROUTES ===========
 // ==================
@@ -45,9 +61,17 @@ res.send('<b>You\'re on an active server.  Find the right page.</b>');
 });
 
 app.get('/request-token', function(req, res){
-    console.log('token request made...');
+    console.log(chalk.yellow('token request made...'));
 
     // TODO: promisify return
+    promRes.getRandomPromiseData(3000).then(function(result){
+        console.log(chalk.green(result.payload.message));
+        res.json(result);
+    }).catch(function(reason){
+        console.log(chalk.red(reason.payload.message));
+        res.json(reason);
+    });
+
 });
 
 app.get('/:page', function(req, res){

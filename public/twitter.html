@@ -3,6 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Twitter API Play</title>
+
+    <style>
+
+        .pending {
+            background: rgba(255,175, 0,1);
+        }
+        .success {
+            background: rgba(0, 200, 0, 1);
+        }
+
+        .failure {
+            background: rgba(255, 0 ,0 , 1);
+
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
     <script src="js/debugModule.js"></script>
     <script src="js/PromiseXHR.js"></script>
@@ -28,12 +43,24 @@
 
     // --- event listeners ---
     loginButton.addEventListener('click', function(e){
+
+        resultDiv.classList = '';
+        resultDiv.classList.add('pending');
         Debug.log('login button clicked', resultDiv);
 
         //MAKE the backend call.
-        makeRequest('get', '/request-token').then(function(result){
-            Debug.log('Resulting data: ');
-            console.log(result);
+        makeRequest('get', '/request-token', 'text').then(function(result){
+            resultDiv.classList = '';
+            var jsonObj = JSON.parse(result);
+
+            if (jsonObj.status == 'completed') {
+                resultDiv.classList.add('success');
+            } else {
+                resultDiv.classList.add('failure');
+            }
+
+            Debug.log('Server results: ' + jsonObj.payload.message, resultDiv );
+            console.log(jsonObj);
 
         }).catch(function(reason){
             Debug.log('Error: ');
