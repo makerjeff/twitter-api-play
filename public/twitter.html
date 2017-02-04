@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Twitter API Play</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+    <script src="js/debugModule.js"></script>
+    <script src="js/PromiseXHR.js"></script>
+</head>
+<body>
+
+<h1>Twitter API Play</h1>
+
+<button id="loginButton">Login with Twitter</button>
+
+<div id="resultDiv"></div>
+
+
+<script>
+
+    // --- vars ---
+    var resultDiv = document.getElementById('resultDiv');
+    var loginButton = document.getElementById('loginButton');
+
+    // --- config ---
+    Debug.debugModeOn = true;
+
+
+    // --- event listeners ---
+    loginButton.addEventListener('click', function(e){
+        Debug.log('login button clicked', resultDiv);
+
+        //MAKE the backend call.
+        makeRequest('get', '/request-token').then(function(result){
+            Debug.log('Resulting data: ');
+            console.log(result);
+
+        }).catch(function(reason){
+            Debug.log('Error: ');
+            console.log(reason);
+
+        });
+
+    });
+
+    // --- functions ---
+</script>
+
+</body>
+</html>
