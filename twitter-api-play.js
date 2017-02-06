@@ -35,6 +35,12 @@ var _requestSecret;
 // ========================
 // initialization =========
 // ========================
+// var twitter = new Twitter({
+//     consumerKey: secret.consumerKey,
+//     consumerSecret: secret.consumerSecret,
+//     callback: secret.callback
+// });
+
 var twitter = new Twitter({
     consumerKey: secret.consumerKey,
     consumerSecret: secret.consumerSecret,
@@ -54,9 +60,29 @@ app.use(function(req,res,next){
     next();
 });
 
-//only allow local host (for now, until NGINX is in place)
-app.use(function(req, res, next){
-    res.header("Access-Control-Allow-Origin", "http://localhost");
+// //only allow local host (for now, until NGINX is in place)
+// app.use(function(req, res, next){
+//     res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+//     next();
+// });
+
+// Add headers
+app.use(function (req, res, next) {
+
+    // Website you wish to allow to connect
+    res.header('Access-Control-Allow-Origin', '*');
+
+    // Request methods you wish to allow
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.header('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
     next();
 });
 
@@ -84,23 +110,63 @@ app.get('/request-token', function(req, res){
     twitter.getRequestToken(function(err, requestToken, requestSecret, results){
         if(err) {
             res.status(500).send(err);
+            console.log(err);
         } else {
             _requestSecret = requestSecret;
+            console.log('request token: ' + requestToken);
+            console.log('request secret: ' + requestSecret);
 
             // pop open twitter in another window instead of a redirect.
             res.redirect("https://api.twitter.com/oauth/authenticate?oauth_token=" + requestToken);
         }
     });
 
-    // // TODO: promisify return
-    // promRes.getRandomPromiseData(3000).then(function(result){
-    //     console.log(chalk.green(result.payload.message));
-    //     res.json(result);
-    // }).catch(function(reason){
-    //     console.log(chalk.red(reason.payload.message));
-    //     res.json(reason);
-    // });
 
+
+});
+
+app.get('/access-token', function(req, res){
+    var requestToken = req.query.oauth_token;    //TODO: query string not being parsed.
+    var verifier = req.query.oauth_verifier;     //TODO: querys tring not being parsed.
+
+    // HARD CODED tokens work.
+    // var requestToken = 'Q3KqaQAAAAAAzC8VAAABWhUrKSk';
+    // var verifier = 'YHtPF5t18H6jdk1Htr581LwffuA4Mvyl';
+
+    console.log(req.query);
+
+    console.log('attempted request token: ' + requestToken);
+    console.log('attempted verifier: ' + verifier);
+
+    //TODO: Get Access Token
+    twitter.getAccessToken(requestToken, _requestSecret, verifier, function(err, accessToken, accessSecret){
+        if(err){
+            res.status(500).send(err);
+            console.log(err);
+        } else {
+            console.log('accessToken (keep secret): ' + accessToken);
+            console.log('accessSecret (keep secret): ' + accessToken);
+
+            //TODO: Verify Credentials
+            twitter.verifyCredentials(accessToken, accessSecret, function(err, user){
+                if(err) {
+                    res.status(500).send(err);
+                    console.log(err)
+                } else {
+                    res.send(user);
+                }
+            });
+        }
+    });
+});
+
+app.get('/share', function(req, res){
+
+});
+
+app.get('/querystring', function(req,res){
+
+    res.json(req.query);
 });
 
 app.get('/:page', function(req, res){

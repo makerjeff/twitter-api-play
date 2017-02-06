@@ -5,6 +5,9 @@ function makeRequest(method, url, responseType) {
     return new Promise(function(resolve, reject){
         var req = new XMLHttpRequest();
         req.open(method, url, true);
+
+        //specifically for Twitter error...
+        req.setRequestHeader('Access-Control-Allow-Origin', '*');
         req.responseType = responseType;    //'blob', 'arraybuffer', 'text', 'document'
 
         // on load event.

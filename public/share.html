@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Share</title>
+
+    <style>
+
+        .pending {
+            background: rgba(255,175, 0,1);
+        }
+        .success {
+            background: rgba(0, 200, 0, 1);
+        }
+
+        .failure {
+            background: rgba(255, 0 ,0 , 1);
+
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+    <script src="js/debugModule.js"></script>
+    <script src="js/PromiseXHR.js"></script>
+</head>
+<body>
+
+<h1>Twitter API Play</h1>
+
+<h1>Share Page</h1>
+<p id="accessToken">AccessToken (should be templated later)</p>
+
+
+<script>
+
+    // once window has loaded, perform get function
+    window.addEventListener('load', function(e){
+        $.ajax({
+            method: 'GET',
+            url: '/access-token',
+            success: function(data, status, xhr){
+                console.log(data);
+            },
+            error: function(xhr, status, err){
+                console.log(err);
+            }
+        });
+
+    });
+
+
+
+
+</script>
+
+</body>
+</html>
