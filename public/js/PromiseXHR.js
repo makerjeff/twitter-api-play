@@ -25,14 +25,14 @@ function makeRequest(method, url, responseType) {
         };
 
         //on progress event
-        // req.onprogress = function(e) {
-        //     if( e.lengthComputable) {
-        //         var percentComplete = e.loaded / e.total;
-        //         Debug.log((percentComplete * 100).toFixed(2) + '%', resultDiv);
-        //     } else {
-        //         Debug.log('Unable to compute length of file. ', resultDiv);
-        //     }
-        // };
+        req.onprogress = function(e) {
+            if( e.lengthComputable) {
+                var percentComplete = e.loaded / e.total;
+                Debug.log((percentComplete * 100).toFixed(2) + '%', resultDiv);
+            } else {
+                Debug.log('Unable to compute length of file. ', resultDiv);
+            }
+        };
         // send the request.
         req.send();
     });

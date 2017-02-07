@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VideoSpeed</title>
+
+    <script src="js/debugModule.js"></script>
+    <script src="js/PromiseXHR.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+            font-family: 'Impact', sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        .videoContainer {
+            width: 1280px;
+            height: 720px;
+
+            box-sizing: border-box;
+        }
+
+        .video3dp {
+            width: 100%;
+            height: 100%;
+
+            border: 5px dotted black;
+        }
+
+        .infoDiv {
+            position: relative;
+
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            height: 100px;
+            background: rgba(200,200,200,1.0);
+
+            box-sizing: border-box;
+        }
+
+        .addMinusButtons {
+            width: 20px;
+            height: 20px;
+        }
+
+        .bug_IMG {
+            position: absolute;
+
+            top: 400px;
+            left: 850px;
+
+            width: 400px;
+            height: 400px;
+
+            background: url('/images/bug.svg');
+            background-size: 500px 500px;
+            background-position: 0 0;
+            background-repeat: no-repeat;
+
+            z-index: 10;
+
+        }
+
+        .usersContainer {
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+
+            position: absolute;
+
+            width: 150px;
+            height: 150px;
+
+            top: 50px;
+            left: 50px;
+
+            background: white;
+
+            border-radius: 4px;
+            border: 2px solid black;
+            box-sizing: border-box;
+
+            z-index: 10;
+        }
+
+        .usersText {
+
+        }
+
+        .usersCount {
+            font-size: 2em;
+        }
+
+
+
+    </style>
+</head>
+<body>
+
+<div id="usersContainer" class="usersContainer">
+    <div id="usersText" class="usersText">users online</div>
+    <div id="usersCount" class="usersCount">1</div>
+
+    <div id="playbackSpeed" class="usersText">playback speed</div>
+    <div id="playbackSpeedNum" class="usersCount">1.00</div>
+</div>
+
+
+
+
+<div id="bug" class="bug_IMG"></div>
+
+<div id="resultDiv" class="resultDiv">
+    <button id="loadVideo">load video</button>
+</div>
+
+<div id="videoContainer" class="videoContainer"></div>
+
+<!--<div id="infoDiv" class="infoDiv"></div>-->
+
+
+
+<script>
+
+    var playbackSpeed = 1;
+
+    var resultDiv = document.getElementById('resultDiv');
+    var videoContainer = document.getElementById('videoContainer');
+    var button = document.getElementById('loadVideo');
+
+    button.addEventListener('click', function(e){
+        makeRequest('GET', '/videos/video.mp4', 'blob').then(function(result){
+
+            //if promise resolves...
+            makeVideoObject(result);
+
+
+            //suicide.
+            button.parentNode.removeChild(button);
+
+        }).catch(function(result){
+            console.log('Error with promise. You got nothing. ');
+        });
+    });
+
+
+    function makeVideoObject(videoBlobData) {
+        var video = document.createElement('video');
+
+        video.setAttribute('poster', '/images/load_frame.jpg');
+        video.setAttribute('autoplay', 'true');
+        video.setAttribute('loop', 'true');
+        video.src = window.URL.createObjectURL(videoBlobData);
+
+        video.id = 'video3dp';
+        video.classList.add('video3dp');
+
+        videoContainer.appendChild(video);
+
+        video.addEventListener('click', function(e){
+            if(video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        });
+
+//        video.addEventListener('timeupdate', function(e){
+//            Debug.log(video.currentTime + '/' + video.duration, resultDiv);
+//        });
+
+        createVideoSpeedControls(video);
+    }
+
+    function createVideoSpeedControls(videoElement) {
+        var addSpeed = document.createElement('button');
+        addSpeed.id = 'addSpeed';
+        var addSpeedText =document.createTextNode('+');
+        addSpeed.appendChild(addSpeedText);
+        addSpeed.classList.add('addMinusButtons');
+
+        var minusSpeed = document.createElement('button');
+        minusSpeed.id = 'minusSpeed';
+        var minusSpeedText = document.createTextNode('-');
+        minusSpeed.appendChild(minusSpeedText);
+        minusSpeed.classList.add('addMinusButtons');
+
+
+        videoContainer.appendChild(minusSpeed);
+        videoContainer.appendChild(addSpeed);
+
+        addSpeed.addEventListener('click', function(e){
+            playbackSpeed += 0.1;
+            videoElement.playbackRate = playbackSpeed;
+            Debug.log('Current playback speed: ' + playbackSpeed.toFixed(2), resultDiv);
+        });
+        minusSpeed.addEventListener('click', function(e){
+            playbackSpeed -= 0.1;
+            videoElement.playbackRate = playbackSpeed;
+            Debug.log('Current playback speed: ' + playbackSpeed.toFixed(2), resultDiv);
+        });
+
+    }
+
+</script>
+
+</body>
+</html>

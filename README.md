@@ -12,3 +12,4 @@ Experimenting with the Twitter API.
 
 ## Tutorials
 - [How to Implement Twitter Sign Express.JS oAuth](https://www.codementor.io/chrisharrington/how-to-implement-twitter-sign-expressjs-oauth-du107vbhy)
+- [Facebook Graph API: Get Live Streaming Data (works!)](https://developers.facebook.com/docs/videos/live-video/getting-started)
